@@ -1,0 +1,60 @@
+# Python runtime and build outputs
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+build/
+dist/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Python virtual environments
+.venv/
+venv/
+env/
+
+# Node and frontend outputs
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/vite.config.js
+frontend/vite.config.d.ts
+*.tsbuildinfo
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment files
+.env
+.env.*
+!.env.example
+!backend/.env.example
+!frontend/.env.example
+
+# Local databases and generated artifacts
+*.sqlite
+*.sqlite3
+*.db
+database/local/
+uploads/
+tmp/
+logs/
+
+# IDE and OS files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Docker and deployment local state
+.docker/
+docker/.env
