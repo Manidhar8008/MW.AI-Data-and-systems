@@ -137,7 +137,8 @@ class UPVCOnboardingService:
     ) -> list[ExtractedRule]:
         config = self.configuration(tenant_id)
         config.add_document(document)
-        for candidate in self.extractor.extract(document, content):
+        candidates = self.extractor.extract(document, content)
+        for candidate in candidates:
             config.add_rule(
                 ConfigurationRule(
                     key=candidate.key,
@@ -148,7 +149,7 @@ class UPVCOnboardingService:
                     source_document_id=candidate.source_document_id,
                 )
             )
-        return self.extractor.extract(document, content)
+        return candidates
 
     def set_company_name(self, tenant_id: str, company_name: str) -> FabricatorConfiguration:
         config = self.configuration(tenant_id)
