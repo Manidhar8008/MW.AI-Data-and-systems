@@ -1,31 +1,41 @@
-# Automation Engine v0
+# Event + Tool Layer
 
-The first implementation provides a deliberately small execution kernel:
+The automation runtime now has three explicit primitives:
 
-- register automation definitions
-- filter definitions by vertical
-- execute a bounded action
-- verify output
-- capture success/failure/escalation state
-- retain input/output and timestamps for later persistence
+```text
+EventBus → AutomationEngine → ToolRegistry
+   │              │                │
+ trigger       workflow          bounded action
+```
 
-## First vertical action
+## Events
 
-`upvc.normalize_enquiry` accepts a uPVC enquiry, validates required fields and dimensions, normalizes the payload, and marks it qualified. Its declared next stage is the engineering validation workflow.
+`Event` carries a unique event id, event name, tenant id, payload, and UTC occurrence timestamp.
 
-## Production evolution
+`EventBus` provides subscription and publication. This first version is in-process and synchronous by design; the interface can later be backed by a durable queue.
 
-This kernel will later connect to:
+## Tools
 
-- PostgreSQL persistence
-- event bus / durable queue
-- tenant authorization
-- tool registry
-- AI model adapter
-- workflow scheduling
-- idempotency keys
-- retry policy
-- audit/event store
-- human approval tasks
+`ToolRegistry` exposes bounded business actions. Every tool declares a stable id, description, handler, allowed verticals, and optional human approval requirement.
 
-Do not put provider-specific AI calls directly into domain actions. Keep model providers behind the AI runtime/tool interfaces.
+The registry rejects calls from unauthorized verticals and blocks approval-gated actions until explicitly approved.
+
+## Runtime composition
+
+`AutomationRuntime` wires event triggers to automation definitions and exposes controlled tool execution. Domain code should publish business events and invoke registered tools rather than coupling itself to infrastructure providers.
+
+## Current uPVC slice
+
+```text
+upvc.enquiry.created
+        ↓
+upvc.normalize_enquiry
+        ↓
+qualified enquiry
+        ↓
+(next: engineering validation)
+```
+
+Available tool: `crm.create_follow_up_task`.
+
+This is intentionally a thin vertical-specific tool. CRM persistence, durable queues, idempotency, audit persistence and external integrations are subsequent layers.
