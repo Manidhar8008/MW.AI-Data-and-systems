@@ -1,51 +1,39 @@
-# MW.AI uPVC Fabrication Pipeline
+# MW.AI uPVC Fabrication Brain
+
+The uPVC vertical exposes a deterministic production pipeline:
 
 ```text
 Configuration
-  ↓
-Engineering validation
-  ↓
-BOM
-  ↓
-Profile decomposition
-  ├── frame members
-  └── sash members
-  ↓
-Glass dimensions
-  ↓
-Reinforcement schedule
-  ↓
-Hardware schedule
-  ↓
-Cut lists
-  ↓
-1D stock cutting optimizer
-  ↓
-Production order
+  -> Engineering
+  -> Commercial BOM
+  -> Profile decomposition
+  -> Glass dimensions
+  -> Reinforcement schedule
+  -> Hardware schedule
+  -> Cut lists
+  -> 1D stock optimization
+  -> Production Order
 ```
 
-## Deterministic rules
+## Fabrication rules
 
-The planner uses explicit `FabricationRules` and `PriceBook` inputs. It does not infer manufacturer-specific fabrication dimensions. Generic offsets, stock lengths and reinforcement thresholds are configuration defaults and must be replaced by approved system rules for live production.
+`FabricationRules` and `ProfileRule` contain configurable system parameters:
 
-## Cutting optimization
+- profile codes and stock lengths
+- frame/sash allowances
+- glazing clearance
+- reinforcement threshold and stock length
+- hardware quantities
+- saw kerf
 
-The first optimizer uses a deterministic first-fit-decreasing packing strategy. Every required cut is sorted from longest to shortest and placed into the first stock bar with enough remaining length. The resulting `CutPlan` records stock bars, cuts, offcuts, total piece length and utilization.
+The defaults are intentionally generic. A production tenant must load approved profile-system and hardware rules before the resulting cut plan is treated as manufacturing authority.
 
-This is a baseline optimization layer. A later optimizer can add kerf, end trimming, saw constraints, profile-specific nesting, remnant inventory and multi-order batch optimization.
+## Traceability
 
-## Production order
+Every cut piece retains a source such as `outer_frame_width` or `sash_1_height`. The production order contains the configuration id plus engineering, glass, reinforcement, hardware and optimized cut plans.
 
-`ProductionOrder` preserves:
+## Optimization
 
-- configuration id
-- engineering validity
-- fabrication line items
-- glass pieces and dimensions
-- reinforcement pieces
-- hardware schedule
-- profile cut plan
-- reinforcement cut plan
-- engineering warnings
+The current optimizer is deterministic first-fit-decreasing and accounts for saw kerf. It reports stock consumed, usable piece length, kerf, waste and utilization.
 
-The order is marked `ready_for_production` only after engineering validation succeeds.
+This is a baseline optimizer, not CNC/saw-machine-specific nesting. Future machine adapters can consume the same `ProductionOrder` contract.
