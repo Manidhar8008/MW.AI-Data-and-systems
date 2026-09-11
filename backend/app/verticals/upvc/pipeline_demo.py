@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-from decimal import Decimal
-
-from .estimation import PriceBook, UPVCProductionPipeline
+from .estimation import UPVCProductionPipeline
 from .models import GlassType, Measurement, Opening, OpeningType, UPVCConfiguration
 
 
@@ -18,10 +16,7 @@ def main() -> None:
         sash_count=2,
     )
 
-    pipeline = UPVCProductionPipeline(
-        UPVCProductionPipeline.__annotations__ and None
-    )
-    engineering, bom, quote = pipeline.run(configuration)
+    engineering, bom, quote = UPVCProductionPipeline().run(configuration)
 
     print("ENGINEERING:", engineering)
     print("BOM:")
